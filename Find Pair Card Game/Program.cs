@@ -39,6 +39,19 @@ namespace Find_Pair_Card_Game
             {
                 DispatchEvents();
 
+                if (GetMouseButtonDown(0) == true)
+                {
+                    int cardIndex = GetCardIndexByMousePosition();
+
+                    if (cardIndex != -1)
+                    {
+                        cardsArr[cardIndex, (int)CardData.State] = 1;
+                    }
+                }
+
+
+
+
                 ClearWindow();
 
                 DrawCards();
@@ -82,13 +95,27 @@ namespace Find_Pair_Card_Game
 
             for (int i = 0; i < cardsArr.GetLength(0); i++)
             {
-                cardsArr[i, (int)CardData.State] = 1;
+                cardsArr[i, (int)CardData.State] = 0;
                 cardsArr[i, (int)CardData.PosX] = (i % cardsInLine) * (cardWidth + space) + bottomOffset;
                 cardsArr[i, (int)CardData.PosY] = (i / cardsInLine) * (cardHeigth + space) + topOffset;
                 cardsArr[i, (int)CardData.Width] = cardWidth;
                 cardsArr[i, (int)CardData.Height] = cardHeigth;
                 cardsArr[i, (int)CardData.ImageId] = cardsId[i];
             }
+        }
+
+        static int GetCardIndexByMousePosition()
+        {
+            for (int i = 0; i < cardsArr.GetLength(0); i++)
+            {
+                bool isInCard = MouseX >= cardsArr[i, (int)CardData.PosX] && MouseY >= cardsArr[i, (int)CardData.PosY] &&
+                    MouseX <= cardsArr[i, (int)CardData.PosX] + cardsArr[i, (int)CardData.Width] &&
+                    MouseY <= cardsArr[i, (int)CardData.PosY] + cardsArr[i, (int)CardData.Height];
+
+                if (isInCard) return i;
+            }
+
+            return -1;
         }
 
         static int[] _getCardsId()
@@ -103,12 +130,12 @@ namespace Find_Pair_Card_Game
                 idArr[i + 1] = idArr[i];
             }
 
-            _shuffleId(idArr);
+            _shuffleCardsId(idArr);
 
             return idArr;
         }
 
-        static void _shuffleId(int[] arr)
+        static void _shuffleCardsId(int[] arr)
         {
             Random rnd = new Random();
 
