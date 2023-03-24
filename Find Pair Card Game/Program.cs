@@ -19,7 +19,7 @@ namespace Find_Pair_Card_Game
         }
 
         static int[,] cardsArr;
-        static int amountCards = 30;
+        static int amountCards = 2;
         static int cardWidth = 50;
         static int cardHeigth = 50;
 
@@ -37,7 +37,10 @@ namespace Find_Pair_Card_Game
             int firstOpenIndex = -1;
             int secondOpenIndex = -1;
 
+            int cardsLeft = amountCards;
+
             bool isNewGame = true;
+            bool isEndGame = false;
 
             InitCardsArr();
 
@@ -47,9 +50,8 @@ namespace Find_Pair_Card_Game
 
                 if (isNewGame)
                 {
-                    ChangeCardsState();
+                    ChangeCardsState(1);
                 }
-
 
                 if (openCards == 2)
                 {
@@ -58,6 +60,8 @@ namespace Find_Pair_Card_Game
                     {
                         cardsArr[firstOpenIndex, (int)CardData.State] = -1;
                         cardsArr[secondOpenIndex, (int)CardData.State] = -1;
+
+                        cardsLeft -= 2;
                     }
                     else
                     {
@@ -87,16 +91,24 @@ namespace Find_Pair_Card_Game
                     }
                 }
 
+                if(cardsLeft == 0) isEndGame = true;
+
                 ClearWindow();
 
                 DrawCards();
+
+                if (isEndGame)
+                {
+                    SetFillColor(color: SFML.Graphics.Color.Red);
+                    DrawText(300, 300, "Все карты открыты!", 30);
+                }
 
                 DisplayWindow();
 
                 if (isNewGame)
                 {
                     isNewGame = false;
-                    ChangeCardsState();
+                    ChangeCardsState(0);
                     Delay(5000);
                 }
 
@@ -151,14 +163,11 @@ namespace Find_Pair_Card_Game
             }
         }
 
-        static void ChangeCardsState()
+        static void ChangeCardsState(int state)
         {
             for (int i = 0; i < cardsArr.GetLength(0); i++)
             {
-                if (cardsArr[i, (int)CardData.State] == 0) 
-                    cardsArr[i, (int)CardData.State] = 1;
-                else if (cardsArr[i, (int)CardData.State] == 1)
-                    cardsArr[i, (int)CardData.State] = 0;
+                    cardsArr[i, (int)CardData.State] = state;               
             }
         }
 
