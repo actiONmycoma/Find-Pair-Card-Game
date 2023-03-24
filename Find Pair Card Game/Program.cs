@@ -2,6 +2,8 @@
 using SFML.System;
 using SFML.Learning;
 using SFML.Window;
+using SFML.Graphics;
+using SFML.Audio;
 
 
 namespace Find_Pair_Card_Game
@@ -33,6 +35,8 @@ namespace Find_Pair_Card_Game
         {
             InitWindow(800, 600, "Найди пару");
 
+            SetFont("arialmt.ttf");
+
             int openCards = 0;
             int firstOpenIndex = -1;
             int secondOpenIndex = -1;
@@ -52,6 +56,8 @@ namespace Find_Pair_Card_Game
                 {
                     ChangeCardsState(1);
                 }
+
+                if (cardsLeft == 0) isEndGame = true;
 
                 if (openCards == 2)
                 {
@@ -91,16 +97,14 @@ namespace Find_Pair_Card_Game
                     }
                 }
 
-                if(cardsLeft == 0) isEndGame = true;
-
                 ClearWindow();
 
                 DrawCards();
 
                 if (isEndGame)
                 {
-                    SetFillColor(color: SFML.Graphics.Color.Red);
-                    DrawText(300, 300, "Все карты открыты!", 30);
+                    SetFillColor(255, 255, 255);
+                    DrawText(300, 300, "Все карты открыты!", 40);
                 }
 
                 DisplayWindow();
@@ -167,7 +171,7 @@ namespace Find_Pair_Card_Game
         {
             for (int i = 0; i < cardsArr.GetLength(0); i++)
             {
-                    cardsArr[i, (int)CardData.State] = state;               
+                cardsArr[i, (int)CardData.State] = state;
             }
         }
 
