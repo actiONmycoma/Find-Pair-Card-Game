@@ -33,21 +33,49 @@ namespace Find_Pair_Card_Game
         {
             InitWindow(800, 600, "Найди пару");
 
-            InitCardsArr();
+            int openCards = 0;
+            int firstOpenIndex = -1;
+            int secondOpenIndex = -1;
 
-            bool a = true;
+            InitCardsArr();
 
             while (true)
             {
                 DispatchEvents();
 
+                if (openCards == 2)
+                {
+                    if (cardsArr[firstOpenIndex, (int)CardData.ImageId] ==
+                        cardsArr[secondOpenIndex, (int)CardData.ImageId])
+                    {
+                        cardsArr[firstOpenIndex, (int)CardData.State] = -1;
+                        cardsArr[secondOpenIndex, (int)CardData.State] = -1;
+                    }
+                    else
+                    {
+                        cardsArr[firstOpenIndex, (int)CardData.State] = 0;
+                        cardsArr[secondOpenIndex, (int)CardData.State] = 0;
+                    }
+
+                    openCards = 0;
+                    firstOpenIndex = -1;
+                    secondOpenIndex = -1;
+
+                    Delay(1500);
+                }
+
                 if (GetMouseButtonDown(0) == true)
                 {
                     int cardIndex = GetCardIndexByMousePosition();
 
-                    if (cardIndex != -1)
+                    if (cardIndex != -1 && cardIndex != firstOpenIndex)
                     {
                         cardsArr[cardIndex, (int)CardData.State] = 1;
+
+                        openCards++;
+
+                        if (openCards == 1) firstOpenIndex = cardIndex;
+                        if (openCards == 2) secondOpenIndex = cardIndex;
                     }
                 }
 
@@ -55,7 +83,7 @@ namespace Find_Pair_Card_Game
 
 
                 ClearWindow();
-                
+
                 DrawCards();
 
                 DisplayWindow();
@@ -84,8 +112,11 @@ namespace Find_Pair_Card_Game
                     if (cardsArr[i, (int)CardData.ImageId] == 5) SetFillColor(255, 255, 255);
                 }
 
-                FillRectangle(cardsArr[i, (int)CardData.PosX], cardsArr[i, (int)CardData.PosY],
-                    cardsArr[i, (int)CardData.Width], cardsArr[i, (int)CardData.Height]);
+                if (cardsArr[i, (int)CardData.State] != -1)
+                {
+                    FillRectangle(cardsArr[i, (int)CardData.PosX], cardsArr[i, (int)CardData.PosY],
+                                cardsArr[i, (int)CardData.Width], cardsArr[i, (int)CardData.Height]);
+                }
 
                 SetFillColor(255, 255, 255);
             }
