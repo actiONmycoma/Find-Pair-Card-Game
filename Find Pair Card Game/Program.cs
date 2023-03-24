@@ -35,6 +35,8 @@ namespace Find_Pair_Card_Game
 
             InitCardsArr();
 
+            bool a = true;
+
             while (true)
             {
                 DispatchEvents();
@@ -53,7 +55,7 @@ namespace Find_Pair_Card_Game
 
 
                 ClearWindow();
-
+                
                 DrawCards();
 
                 DisplayWindow();
@@ -79,11 +81,13 @@ namespace Find_Pair_Card_Game
 
                 if (cardsArr[i, (int)CardData.State] == 0)//рубашкой вверх
                 {
-                    if (cardsArr[i, (int)CardData.ImageId] == 5) SetFillColor(0, 0, 0);
+                    if (cardsArr[i, (int)CardData.ImageId] == 5) SetFillColor(255, 255, 255);
                 }
 
                 FillRectangle(cardsArr[i, (int)CardData.PosX], cardsArr[i, (int)CardData.PosY],
                     cardsArr[i, (int)CardData.Width], cardsArr[i, (int)CardData.Height]);
+
+                SetFillColor(255, 255, 255);
             }
         }
 
