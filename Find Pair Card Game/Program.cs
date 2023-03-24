@@ -37,11 +37,19 @@ namespace Find_Pair_Card_Game
             int firstOpenIndex = -1;
             int secondOpenIndex = -1;
 
+            bool isNewGame = true;
+
             InitCardsArr();
 
             while (true)
             {
                 DispatchEvents();
+
+                if (isNewGame)
+                {
+                    ChangeCardsState();
+                }
+
 
                 if (openCards == 2)
                 {
@@ -79,14 +87,18 @@ namespace Find_Pair_Card_Game
                     }
                 }
 
-
-
-
                 ClearWindow();
 
                 DrawCards();
 
                 DisplayWindow();
+
+                if (isNewGame)
+                {
+                    isNewGame = false;
+                    ChangeCardsState();
+                    Delay(5000);
+                }
 
                 Delay(1);
             }
@@ -136,6 +148,17 @@ namespace Find_Pair_Card_Game
                 cardsArr[i, (int)CardData.Width] = cardWidth;
                 cardsArr[i, (int)CardData.Height] = cardHeigth;
                 cardsArr[i, (int)CardData.ImageId] = cardsId[i];
+            }
+        }
+
+        static void ChangeCardsState()
+        {
+            for (int i = 0; i < cardsArr.GetLength(0); i++)
+            {
+                if (cardsArr[i, (int)CardData.State] == 0) 
+                    cardsArr[i, (int)CardData.State] = 1;
+                else if (cardsArr[i, (int)CardData.State] == 1)
+                    cardsArr[i, (int)CardData.State] = 0;
             }
         }
 
