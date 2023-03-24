@@ -54,12 +54,20 @@ namespace Find_Pair_Card_Game
         {
             for (int i = 0; i < cardsArr.GetLength(0); i++)
             {
-                if (cardsArr[i, (int)CardData.ImageId] == 0) SetFillColor(0, 100, 25);
-                if (cardsArr[i, (int)CardData.ImageId] == 1) SetFillColor(60, 10, 115);
-                if (cardsArr[i, (int)CardData.ImageId] == 2) SetFillColor(30, 150, 0);
-                if (cardsArr[i, (int)CardData.ImageId] == 3) SetFillColor(100, 200, 100);
-                if (cardsArr[i, (int)CardData.ImageId] == 4) SetFillColor(150, 50, 25);
-                if (cardsArr[i, (int)CardData.ImageId] == 5) SetFillColor(200, 80, 150);
+                if (cardsArr[i, (int)CardData.State] == 1)//лицом вверх
+                {
+                    if (cardsArr[i, (int)CardData.ImageId] == 0) SetFillColor(0, 100, 25);
+                    if (cardsArr[i, (int)CardData.ImageId] == 1) SetFillColor(60, 10, 115);
+                    if (cardsArr[i, (int)CardData.ImageId] == 2) SetFillColor(30, 150, 0);
+                    if (cardsArr[i, (int)CardData.ImageId] == 3) SetFillColor(100, 200, 100);
+                    if (cardsArr[i, (int)CardData.ImageId] == 4) SetFillColor(150, 50, 25);
+                    if (cardsArr[i, (int)CardData.ImageId] == 5) SetFillColor(200, 80, 150);
+                }
+
+                if (cardsArr[i, (int)CardData.State] == 0)//рубашкой вверх
+                {
+                    if (cardsArr[i, (int)CardData.ImageId] == 5) SetFillColor(0, 0, 0);
+                }
 
                 FillRectangle(cardsArr[i, (int)CardData.PosX], cardsArr[i, (int)CardData.PosY],
                     cardsArr[i, (int)CardData.Width], cardsArr[i, (int)CardData.Height]);
