@@ -253,6 +253,7 @@ namespace Find_Pair_Card_Game
                     {
                         SetFillColor(255, 255, 255);
                         DrawText(120, 300, "Время вышло! Вы проиграли!", 40);
+                        DrawText(120, 350, $"Осталось карт: {cardsLeft}", 40);
                     }
 
                     DrawText(120, 450, "Начать игру заново?", 40);
