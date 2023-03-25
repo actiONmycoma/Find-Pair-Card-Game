@@ -23,7 +23,7 @@ namespace Find_Pair_Card_Game
         static int[,] cards;
         static string[] imageNames;
 
-        static int amountCards = 4;
+        static int amountCards = 30;
         static int cardWidth = 120;
         static int cardHeigth = 120;
 
@@ -41,7 +41,21 @@ namespace Find_Pair_Card_Game
             string backgroundImage = LoadTexture("background.png");
             string blurImage = LoadTexture("blur.png");
 
+            string[] levelsImage =
+            {
+                LoadTexture("Level_1.png"),
+                LoadTexture("Level_2.png"),
+                LoadTexture("Level_3.png")
+            };
+
+            string[] buttonsImage =
+            {
+                LoadTexture("noButton.png"),
+                LoadTexture("yesButton.png")
+            };
+
             string flipSound = LoadSound("flipcard.wav");
+            string clickCardSound = LoadSound("clickCard.wav");
             string clickSound = LoadSound("click.wav");
 
             while (true)
@@ -50,26 +64,61 @@ namespace Find_Pair_Card_Game
                 int firstOpenIndex = -1;
                 int secondOpenIndex = -1;
 
-                int cardsLeft = amountCards;
+                int cardsLeft;
                 int clickCount = 0;
                 int timeCount = 0;
 
-                int level = 2;
+                int level = 0;
 
                 bool isNewGame = true;
                 bool isEndGame = false;
                 bool isLose = false;
 
+                //цикл стартового экрана
+                while (true)
+                {
+                    DispatchEvents();
+
+                    if (GetMouseButtonDown(0) == true)
+                    {
+                        if (MouseX >= 120 && MouseX <= 320 && MouseY >= 350 && MouseY <= 550) level = 1;
+                        if (MouseX >= 350 && MouseX <= 550 && MouseY >= 350 && MouseY <= 550) level = 2;
+                        if (MouseX >= 580 && MouseX <= 780 && MouseY >= 350 && MouseY <= 550) level = 3;
+                    }
+
+                    if (level != 0)
+                    {
+                        PlaySound(clickSound);
+
+                        if (level == 1) amountCards = 12;
+                        if (level == 2) amountCards = 24;
+                        if (level == 3) amountCards = 30;
+
+                        cardsLeft = amountCards;
+
+                        break;
+                    }
+
+                    DrawSprite(backgroundImage, 0, 0);
+                    DrawSprite(blurImage, 0, 0);
+
+                    SetFillColor(255, 255, 255);
+                    DrawText(120, 150, "Игра \"НАЙДИ ПАРУ\"", 40);
+                    DrawText(120, 250, "Выбирите сложность", 40);
+
+                    DrawSprite(levelsImage[0], 120, 350);
+                    DrawSprite(levelsImage[1], 350, 350);
+                    DrawSprite(levelsImage[2], 580, 350);
+
+                    DisplayWindow();
+
+                    Delay(1);
+                }
+
                 InitCardsArr();
                 LoadCardsImage();
 
                 ChangeCardsState(1);
-
-                DispatchEvents();
-
-                DrawSprite(backgroundImage, 0, 0);
-                DrawSprite(blurImage, 0, 0);
-
 
                 //основной игровой цикл
                 while (true)
@@ -99,11 +148,14 @@ namespace Find_Pair_Card_Game
                             cards[secondOpenIndex, (int)CardData.State] = -1;
 
                             cardsLeft -= 2;
+
+                            if (level == 2) timeCount -= 200;
+                            if (level == 3) timeCount -= 150;
                         }
                         else
                         {
                             playSound = true;
-                            
+
                             cards[firstOpenIndex, (int)CardData.State] = 0;
                             cards[secondOpenIndex, (int)CardData.State] = 0;
                         }
@@ -126,7 +178,7 @@ namespace Find_Pair_Card_Game
 
                         if (cardIndex != -1 && cardIndex != firstOpenIndex)
                         {
-                            PlaySound(clickSound);
+                            PlaySound(clickCardSound);
 
                             cards[cardIndex, (int)CardData.State] = 1;
 
@@ -134,7 +186,7 @@ namespace Find_Pair_Card_Game
                             clickCount++;
 
                             if (openCards == 1) firstOpenIndex = cardIndex;
-                            if (openCards == 2) secondOpenIndex = cardIndex;                           
+                            if (openCards == 2) secondOpenIndex = cardIndex;
                         }
                     }
 
@@ -159,27 +211,35 @@ namespace Find_Pair_Card_Game
                     Delay(1);
                 }
 
-
-                DrawSprite(blurImage, 0, 0);
-
-
-                if (isEndGame)
+                //цикл конца игры
+                while (true)
                 {
-                    SetFillColor(255, 255, 255);
-                    DrawText(300, 300, "Все карты открыты!", 40);
-                    DrawText(300, 350, $"Количество ходов {clickCount / 2}", 40);
+                    DispatchEvents();
+
+                    DrawSprite(backgroundImage, 0, 0);
+                    DrawSprite(blurImage, 0, 0);
+
+                    if (isEndGame)
+                    {
+                        SetFillColor(255, 255, 255);
+                        DrawText(120, 300, "Все карты открыты!", 40);
+                        DrawText(120, 350, "Начать игру заново?", 40);
+                        DrawText(120, 400, $"Количество ходов {clickCount / 2}", 40);
+                    }
+
+                    if (isLose)
+                    {
+                        SetFillColor(255, 255, 255);
+                        DrawText(120, 300, "Время вышло! Вы проиграли!", 40);
+                        DrawText(120, 350, "Начать игру заново?", 40);
+                    }
+
+
+                    DisplayWindow();
+
+                    Delay(1);
                 }
 
-                if (isLose)
-                {
-                    SetFillColor(255, 255, 255);
-                    DrawText(300, 300, "Время вышло! Вы проиграли!", 40);
-                }
-
-
-                DisplayWindow();
-
-                Delay(3000);
             }
 
         }
