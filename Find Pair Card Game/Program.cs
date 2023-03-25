@@ -58,7 +58,9 @@ namespace Find_Pair_Card_Game
             string clickCardSound = LoadSound("clickCard.wav");
             string clickSound = LoadSound("click.wav");
 
-            while (true)
+            bool isGame = true;
+
+            while (isGame)
             {
                 int openCards = 0;
                 int firstOpenIndex = -1;
@@ -118,7 +120,7 @@ namespace Find_Pair_Card_Game
                 InitCardsArr();
                 LoadCardsImage();
 
-                ChangeCardsState(1);
+                ChangeCardsState(1);                
 
                 //основной игровой цикл
                 while (true)
@@ -216,6 +218,27 @@ namespace Find_Pair_Card_Game
                 {
                     DispatchEvents();
 
+                    bool inButton = false;
+
+                    if (GetMouseButtonDown(0) == true)
+                    {
+                        if (MouseX >= 120 && MouseX <= 320 && MouseY >= 550 && MouseY <= 679) inButton = true;
+
+                        if (MouseX >= 450 && MouseX <= 750 && MouseY >= 550 && MouseY <= 679)
+                        {
+                            isGame = false;
+                            inButton = true;
+                        }
+                    }
+
+                    if (inButton)
+                    {
+                        PlaySound(clickSound);
+                        break;
+                    }
+
+                    ClearWindow();
+
                     DrawSprite(backgroundImage, 0, 0);
                     DrawSprite(blurImage, 0, 0);
 
@@ -223,17 +246,19 @@ namespace Find_Pair_Card_Game
                     {
                         SetFillColor(255, 255, 255);
                         DrawText(120, 300, "Все карты открыты!", 40);
-                        DrawText(120, 350, "Начать игру заново?", 40);
-                        DrawText(120, 400, $"Количество ходов {clickCount / 2}", 40);
+                        DrawText(120, 350, $"Количество ходов {clickCount / 2}", 40);
                     }
 
                     if (isLose)
                     {
                         SetFillColor(255, 255, 255);
                         DrawText(120, 300, "Время вышло! Вы проиграли!", 40);
-                        DrawText(120, 350, "Начать игру заново?", 40);
                     }
 
+                    DrawText(120, 450, "Начать игру заново?", 40);
+
+                    DrawSprite(buttonsImage[1], 120, 550);
+                    DrawSprite(buttonsImage[0], 450, 550);
 
                     DisplayWindow();
 
