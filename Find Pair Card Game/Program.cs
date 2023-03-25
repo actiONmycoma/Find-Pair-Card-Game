@@ -20,20 +20,23 @@ namespace Find_Pair_Card_Game
             ImageId
         }
 
-        static int[,] cardsArr;
-        static int amountCards = 2;
-        static int cardWidth = 50;
-        static int cardHeigth = 50;
+        static int[,] cards;
+        static string[] imageNames;
 
-        static int topOffset = 20;
+        static int amountCards = 30;
+        static int cardWidth = 120;
+        static int cardHeigth = 120;
+
+        static int topOffset = 60;
         static int bottomOffset = 20;
         static int space = 30;
-        static int cardsInLine = 5;
+        static int cardsInLine = 6;
 
+        static string backgroundImage = LoadTexture("background.png");
 
         static void Main(string[] args)
         {
-            InitWindow(800, 600, "Найди пару");
+            InitWindow(910, 800, "Найди пару");
 
             SetFont("arialmt.ttf");
 
@@ -42,11 +45,13 @@ namespace Find_Pair_Card_Game
             int secondOpenIndex = -1;
 
             int cardsLeft = amountCards;
+            int clickCount = 0;
 
             bool isNewGame = true;
             bool isEndGame = false;
 
             InitCardsArr();
+            LoadCardsImage();
 
             while (true)
             {
@@ -61,18 +66,18 @@ namespace Find_Pair_Card_Game
 
                 if (openCards == 2)
                 {
-                    if (cardsArr[firstOpenIndex, (int)CardData.ImageId] ==
-                        cardsArr[secondOpenIndex, (int)CardData.ImageId])
+                    if (cards[firstOpenIndex, (int)CardData.ImageId] ==
+                        cards[secondOpenIndex, (int)CardData.ImageId])
                     {
-                        cardsArr[firstOpenIndex, (int)CardData.State] = -1;
-                        cardsArr[secondOpenIndex, (int)CardData.State] = -1;
+                        cards[firstOpenIndex, (int)CardData.State] = -1;
+                        cards[secondOpenIndex, (int)CardData.State] = -1;
 
                         cardsLeft -= 2;
                     }
                     else
                     {
-                        cardsArr[firstOpenIndex, (int)CardData.State] = 0;
-                        cardsArr[secondOpenIndex, (int)CardData.State] = 0;
+                        cards[firstOpenIndex, (int)CardData.State] = 0;
+                        cards[secondOpenIndex, (int)CardData.State] = 0;
                     }
 
                     openCards = 0;
@@ -88,9 +93,10 @@ namespace Find_Pair_Card_Game
 
                     if (cardIndex != -1 && cardIndex != firstOpenIndex)
                     {
-                        cardsArr[cardIndex, (int)CardData.State] = 1;
+                        cards[cardIndex, (int)CardData.State] = 1;
 
                         openCards++;
+                        clickCount++;
 
                         if (openCards == 1) firstOpenIndex = cardIndex;
                         if (openCards == 2) secondOpenIndex = cardIndex;
@@ -99,12 +105,15 @@ namespace Find_Pair_Card_Game
 
                 ClearWindow();
 
+                DrawSprite(backgroundImage, 0, 0);
+
                 DrawCards();
 
                 if (isEndGame)
                 {
                     SetFillColor(255, 255, 255);
                     DrawText(300, 300, "Все карты открыты!", 40);
+                    DrawText(300, 350, $"Количество ходов {clickCount / 2}", 40);
                 }
 
                 DisplayWindow();
@@ -123,65 +132,65 @@ namespace Find_Pair_Card_Game
 
         static void DrawCards()
         {
-            for (int i = 0; i < cardsArr.GetLength(0); i++)
+            for (int i = 0; i < cards.GetLength(0); i++)
             {
-                if (cardsArr[i, (int)CardData.State] == 1)//лицом вверх
+                if (cards[i, (int)CardData.State] == 1)//лицом вверх
                 {
-                    if (cardsArr[i, (int)CardData.ImageId] == 0) SetFillColor(0, 100, 25);
-                    if (cardsArr[i, (int)CardData.ImageId] == 1) SetFillColor(60, 10, 115);
-                    if (cardsArr[i, (int)CardData.ImageId] == 2) SetFillColor(30, 150, 0);
-                    if (cardsArr[i, (int)CardData.ImageId] == 3) SetFillColor(100, 200, 100);
-                    if (cardsArr[i, (int)CardData.ImageId] == 4) SetFillColor(150, 50, 25);
-                    if (cardsArr[i, (int)CardData.ImageId] == 5) SetFillColor(200, 80, 150);
+                    DrawSprite(imageNames[cards[i, (int)CardData.ImageId]],
+                        cards[i, (int)CardData.PosX], cards[i, (int)CardData.PosY]);
                 }
 
-                if (cardsArr[i, (int)CardData.State] == 0)//рубашкой вверх
+                if (cards[i, (int)CardData.State] == 0)//рубашкой вверх
                 {
-                    if (cardsArr[i, (int)CardData.ImageId] == 5) SetFillColor(255, 255, 255);
+                    DrawSprite(imageNames[0], cards[i, (int)CardData.PosX], cards[i, (int)CardData.PosY]);
                 }
-
-                if (cardsArr[i, (int)CardData.State] != -1)
-                {
-                    FillRectangle(cardsArr[i, (int)CardData.PosX], cardsArr[i, (int)CardData.PosY],
-                                cardsArr[i, (int)CardData.Width], cardsArr[i, (int)CardData.Height]);
-                }
-
-                SetFillColor(255, 255, 255);
             }
         }
 
         static void InitCardsArr()
         {
-            cardsArr = new int[amountCards, Enum.GetValues(typeof(CardData)).Length];
+            cards = new int[amountCards, Enum.GetValues(typeof(CardData)).Length];
 
             int[] cardsId = _getCardsId();
 
-            for (int i = 0; i < cardsArr.GetLength(0); i++)
+            for (int i = 0; i < cards.GetLength(0); i++)
             {
-                cardsArr[i, (int)CardData.State] = 0;
-                cardsArr[i, (int)CardData.PosX] = (i % cardsInLine) * (cardWidth + space) + bottomOffset;
-                cardsArr[i, (int)CardData.PosY] = (i / cardsInLine) * (cardHeigth + space) + topOffset;
-                cardsArr[i, (int)CardData.Width] = cardWidth;
-                cardsArr[i, (int)CardData.Height] = cardHeigth;
-                cardsArr[i, (int)CardData.ImageId] = cardsId[i];
+                cards[i, (int)CardData.State] = 0;
+                cards[i, (int)CardData.PosX] = (i % cardsInLine) * (cardWidth + space) + bottomOffset;
+                cards[i, (int)CardData.PosY] = (i / cardsInLine) * (cardHeigth + space) + topOffset;
+                cards[i, (int)CardData.Width] = cardWidth;
+                cards[i, (int)CardData.Height] = cardHeigth;
+                cards[i, (int)CardData.ImageId] = cardsId[i];
+            }
+        }
+
+        static void LoadCardsImage()
+        {
+            imageNames = new string[16];
+
+            imageNames[0] = LoadTexture("Icon_close.png");
+
+            for (int i = 1; i < imageNames.Length; i++)
+            {
+                imageNames[i] = LoadTexture($"Icon_{i}.png");
             }
         }
 
         static void ChangeCardsState(int state)
         {
-            for (int i = 0; i < cardsArr.GetLength(0); i++)
+            for (int i = 0; i < cards.GetLength(0); i++)
             {
-                cardsArr[i, (int)CardData.State] = state;
+                cards[i, (int)CardData.State] = state;
             }
         }
 
         static int GetCardIndexByMousePosition()
         {
-            for (int i = 0; i < cardsArr.GetLength(0); i++)
+            for (int i = 0; i < cards.GetLength(0); i++)
             {
-                bool isInCard = MouseX >= cardsArr[i, (int)CardData.PosX] && MouseY >= cardsArr[i, (int)CardData.PosY] &&
-                    MouseX <= cardsArr[i, (int)CardData.PosX] + cardsArr[i, (int)CardData.Width] &&
-                    MouseY <= cardsArr[i, (int)CardData.PosY] + cardsArr[i, (int)CardData.Height];
+                bool isInCard = MouseX >= cards[i, (int)CardData.PosX] && MouseY >= cards[i, (int)CardData.PosY] &&
+                    MouseX <= cards[i, (int)CardData.PosX] + cards[i, (int)CardData.Width] &&
+                    MouseY <= cards[i, (int)CardData.PosY] + cards[i, (int)CardData.Height];
 
                 if (isInCard) return i;
             }
@@ -191,13 +200,13 @@ namespace Find_Pair_Card_Game
 
         static int[] _getCardsId()
         {
-            Random rnd = new Random();
-
             int[] idArr = new int[amountCards];
+
+            int id = 1;
 
             for (int i = 0; i < idArr.Length; i += 2)
             {
-                idArr[i] = rnd.Next(6);
+                idArr[i] = id++;
                 idArr[i + 1] = idArr[i];
             }
 
