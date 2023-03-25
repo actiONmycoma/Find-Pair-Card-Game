@@ -23,7 +23,7 @@ namespace Find_Pair_Card_Game
         static int[,] cards;
         static string[] imageNames;
 
-        static int amountCards = 30;
+        static int amountCards = 4;
         static int cardWidth = 120;
         static int cardHeigth = 120;
 
@@ -32,82 +32,136 @@ namespace Find_Pair_Card_Game
         static int space = 30;
         static int cardsInLine = 6;
 
-        static string backgroundImage = LoadTexture("background.png");
-
         static void Main(string[] args)
         {
             InitWindow(910, 800, "Найди пару");
 
-            SetFont("arialmt.ttf");
+            SetFont("Nord-Star-Deco.ttf");
 
-            int openCards = 0;
-            int firstOpenIndex = -1;
-            int secondOpenIndex = -1;
+            string backgroundImage = LoadTexture("background.png");
+            string blurImage = LoadTexture("blur.png");
 
-            int cardsLeft = amountCards;
-            int clickCount = 0;
-
-            bool isNewGame = true;
-            bool isEndGame = false;
-
-            InitCardsArr();
-            LoadCardsImage();
+            string flipSound = LoadSound("flipcard.wav");
+            string clickSound = LoadSound("click.wav");
 
             while (true)
             {
+                int openCards = 0;
+                int firstOpenIndex = -1;
+                int secondOpenIndex = -1;
+
+                int cardsLeft = amountCards;
+                int clickCount = 0;
+                int timeCount = 0;
+
+                int level = 2;
+
+                bool isNewGame = true;
+                bool isEndGame = false;
+                bool isLose = false;
+
+                InitCardsArr();
+                LoadCardsImage();
+
+                ChangeCardsState(1);
+
                 DispatchEvents();
 
-                if (isNewGame)
-                {
-                    ChangeCardsState(1);
-                }
-
-                if (cardsLeft == 0) isEndGame = true;
-
-                if (openCards == 2)
-                {
-                    if (cards[firstOpenIndex, (int)CardData.ImageId] ==
-                        cards[secondOpenIndex, (int)CardData.ImageId])
-                    {
-                        cards[firstOpenIndex, (int)CardData.State] = -1;
-                        cards[secondOpenIndex, (int)CardData.State] = -1;
-
-                        cardsLeft -= 2;
-                    }
-                    else
-                    {
-                        cards[firstOpenIndex, (int)CardData.State] = 0;
-                        cards[secondOpenIndex, (int)CardData.State] = 0;
-                    }
-
-                    openCards = 0;
-                    firstOpenIndex = -1;
-                    secondOpenIndex = -1;
-
-                    Delay(1500);
-                }
-
-                if (GetMouseButtonDown(0) == true)
-                {
-                    int cardIndex = GetCardIndexByMousePosition();
-
-                    if (cardIndex != -1 && cardIndex != firstOpenIndex)
-                    {
-                        cards[cardIndex, (int)CardData.State] = 1;
-
-                        openCards++;
-                        clickCount++;
-
-                        if (openCards == 1) firstOpenIndex = cardIndex;
-                        if (openCards == 2) secondOpenIndex = cardIndex;
-                    }
-                }
-
-                ClearWindow();
-
                 DrawSprite(backgroundImage, 0, 0);
+                DrawSprite(blurImage, 0, 0);
 
-                DrawCards();
+
+                //основной игровой цикл
+                while (true)
+                {
+                    DispatchEvents();
+
+                    if (timeCount >= 910)
+                    {
+                        isLose = true;
+                        break;
+                    }
+
+                    if (cardsLeft == 0)
+                    {
+                        isEndGame = true;
+                        break;
+                    }
+
+                    if (openCards == 2)
+                    {
+                        bool playSound = false;
+
+                        if (cards[firstOpenIndex, (int)CardData.ImageId] ==
+                            cards[secondOpenIndex, (int)CardData.ImageId])
+                        {
+                            cards[firstOpenIndex, (int)CardData.State] = -1;
+                            cards[secondOpenIndex, (int)CardData.State] = -1;
+
+                            cardsLeft -= 2;
+                        }
+                        else
+                        {
+                            playSound = true;
+                            
+                            cards[firstOpenIndex, (int)CardData.State] = 0;
+                            cards[secondOpenIndex, (int)CardData.State] = 0;
+                        }
+
+                        openCards = 0;
+                        firstOpenIndex = -1;
+                        secondOpenIndex = -1;
+
+                        Delay(900);
+
+                        if (playSound) PlaySound(flipSound);
+
+                        Delay(600);
+
+                    }
+
+                    if (GetMouseButtonDown(0) == true)
+                    {
+                        int cardIndex = GetCardIndexByMousePosition();
+
+                        if (cardIndex != -1 && cardIndex != firstOpenIndex)
+                        {
+                            PlaySound(clickSound);
+
+                            cards[cardIndex, (int)CardData.State] = 1;
+
+                            openCards++;
+                            clickCount++;
+
+                            if (openCards == 1) firstOpenIndex = cardIndex;
+                            if (openCards == 2) secondOpenIndex = cardIndex;                           
+                        }
+                    }
+
+                    ClearWindow();
+
+                    DrawSprite(backgroundImage, 0, 0);
+
+                    SetFillColor(247, 240, 6);
+                    FillRectangle(0, 0, 910 - (timeCount += level / 2 + 1), 30);
+
+                    DrawCards();
+
+                    DisplayWindow();
+
+                    if (isNewGame)
+                    {
+                        isNewGame = false;
+                        ChangeCardsState(0);
+                        Delay(5000);
+                    }
+
+                    Delay(1);
+                }
+
+
+                DrawSprite(blurImage, 0, 0);
+
 
                 if (isEndGame)
                 {
@@ -116,16 +170,16 @@ namespace Find_Pair_Card_Game
                     DrawText(300, 350, $"Количество ходов {clickCount / 2}", 40);
                 }
 
-                DisplayWindow();
-
-                if (isNewGame)
+                if (isLose)
                 {
-                    isNewGame = false;
-                    ChangeCardsState(0);
-                    Delay(5000);
+                    SetFillColor(255, 255, 255);
+                    DrawText(300, 300, "Время вышло! Вы проиграли!", 40);
                 }
 
-                Delay(1);
+
+                DisplayWindow();
+
+                Delay(3000);
             }
 
         }
