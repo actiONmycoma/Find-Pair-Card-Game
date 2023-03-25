@@ -151,7 +151,7 @@ namespace Find_Pair_Card_Game
 
                             cardsLeft -= 2;
 
-                            if (level == 2) timeCount -= 200;
+                            if (level == 2) timeCount -= 180;
                             if (level == 3) timeCount -= 150;
                         }
                         else
